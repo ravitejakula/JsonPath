@@ -198,12 +198,16 @@ public abstract class AbstractJsonProvider implements JsonProvider {
 
     @Override
     public Object getProperty(Object obj, Object key) {
-        if (isMap(obj))
-            return ((Map) obj).get(key.toString());
-        else {
-            List list = (List) obj;
+    	if (isMap(obj)) {
+    		Object mapValue = getMapValue(obj, key.toString());
+    		if (mapValue.equals(UNDEFINED)) {
+    			return null;
+    		} else {
+    			return mapValue;
+    		}
+    	} else {
             int index = key instanceof Integer ? (Integer) key : Integer.parseInt(key.toString());
-            return list.get(index);
+            return getArrayIndex(obj, index);
         }
 
     }
