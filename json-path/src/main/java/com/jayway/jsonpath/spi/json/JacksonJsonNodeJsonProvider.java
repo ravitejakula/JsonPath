@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -153,6 +154,22 @@ public class JacksonJsonNodeJsonProvider extends AbstractJsonProvider {
         }
     }
 
+    @Override
+    public Object getProperty(Object obj, Object key) {
+        if (isMap(obj)) {
+        	Object mapValue = getMapValue(obj, key.toString());
+        	if (mapValue.equals(UNDEFINED)) {
+        		return null;
+        	} else 
+        		return mapValue;
+        }
+        else {
+            int index = key instanceof Integer ? (Integer) key : Integer.parseInt(key.toString());
+            return getArrayIndex(obj, index);
+        }
+
+    }
+    
 	@Override
 	public void setProperty(Object obj, Object key, Object value) {
 		// jlolling: Bug: #211 avoid create cloned nodes
