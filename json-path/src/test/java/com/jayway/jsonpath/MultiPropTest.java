@@ -264,4 +264,22 @@ public class MultiPropTest {
         Object arrivalAirportIdentifierValue = jp.getMapValue(jp.getArrayIndex(jp.getMapValue(arrivalAirport, "identifier"), 0), "value");
         Assert.assertEquals(arrivalAirportIdentifierValue, "dallas ft worth texas");
     }
+    
+    /**
+     * Test readroot with '.' missing after $ in jsonpath.
+     */
+    @Test(expected=InvalidPathException.class)
+    public void test_without_a_dot() {
+
+        Map<String, Object> model = new HashMap<String, Object>(){{
+            put("a", "a-val");
+            put("b", "b-val");
+            put("c", "c-val");
+        }};
+
+        Configuration conf = Configuration.builder().jsonProvider(DefaultsImpl.INSTANCE.jsonProvider()).options(Option.SUPPRESS_EXCEPTIONS)
+                .build();
+
+        Object root = using(conf).parse(model).readRoot(new String[] {"$a"});
+    }
 }

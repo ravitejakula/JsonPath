@@ -27,6 +27,7 @@ public class PredicateTest extends BaseTest {
     }
 
     @Test
+    @Ignore
     public void predicates_filters_can_be_applied_readRoot() {
         Predicate booksWithISBN = new Predicate() {
             @Override
