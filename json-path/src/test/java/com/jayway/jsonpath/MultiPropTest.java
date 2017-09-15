@@ -1,6 +1,7 @@
 package com.jayway.jsonpath;
 
 import static com.jayway.jsonpath.JsonPath.using;
+import static com.jayway.jsonpath.Option.ALWAYS_RETURN_LIST;
 import static com.jayway.jsonpath.TestUtils.assertEvaluationThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -169,21 +170,21 @@ public class MultiPropTest {
         Assert.assertEquals(elem1, objectB);
     }
 
-    @Test
-    public void deep_scan_does_not_affect_non_leaf_multi_props_readRoot() {
-        // deep scan + multiprop is quite redundant scenario, but it's not forbidden, so we'd better check
+    @Test(expected=RuntimeException.class)
+    public void deep_scan_throws_exception_readRoot() {
         final String json = "{\"v\": [[{}, 1, {\"a\": {\"v\": 5}, \"b\": {\"v\": 4}, \"c\": {\"v\": 1, \"flag\": true}}]]}";
-        Object result = JsonPath.parse(json).readRoot(new String[] { "$..['a', 'c'].v" });
-
-        // conf.jsonProvider().getMapValue(result, "a")
-        // assertThat(result).asList().containsOnly(5, 1);
-
-        result = JsonPath.parse(json).readRoot(new String[] { "$..v" });
-        Assert.assertNotNull(result);
-
-        result = JsonPath.parse(json).readRoot(new String[] { "$..['a', 'c'][?(@.flag)].v" });
-        // KR - TODO fix this
-        // assertThat(result).asList().containsOnly(1);
+        JsonPath.parse(json).readRoot(new String[] { "$..['a', 'c'].v" });
+    }
+    
+    @Test
+    public void deep_scan_returns_empty_map_readRoot_with_supress_exceptions() {
+        final String json = "{\"v\": [[{}, 1, {\"a\": {\"v\": 5}, \"b\": {\"v\": 4}, \"c\": {\"v\": 1, \"flag\": true}}]]}";
+        Configuration conf = Configuration.builder().options(Option.SUPPRESS_EXCEPTIONS).build();
+        DocumentContext dc = using(conf).parse(json);
+        
+        Object root = dc.readRoot(new String[] { "$..['a', 'c'].v" });
+        Assert.assertTrue(conf.jsonProvider().isMap(root));
+        Assert.assertEquals(root.toString(), "{}");
     }
 
     @Test

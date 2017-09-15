@@ -713,7 +713,12 @@ public class JsonPath {
             return path.evaluate(rootObj, jsonObject, jsonObject, configuration).getRoot();
         } catch (RuntimeException e) {
             // KR - support suppress exception
-            throw e;
+        	if (configuration.getOptions().contains(Option.SUPPRESS_EXCEPTIONS)) {
+        		//Return an empty map.
+        		return configuration.jsonProvider().createMap();
+        	} else {
+        		throw e;
+        	}
         }
 
     }
